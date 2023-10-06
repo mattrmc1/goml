@@ -16,20 +16,18 @@ const (
 	DEFAULT_LEARNING_RATE = 0.1
 )
 
-func getDefaultLayerSizes() []int {
-	return []int{3, 3}
-}
-
 var rate float64
 var layers []int
 var weights [][][]float64
 var biases [][]float64
 
 func initialize(input int, output int, config Config) {
-	rate = config.learning_rate
+	layers = nil
 	layers = append(layers, input)
 	layers = append(layers, config.layers...)
 	layers = append(layers, output)
+
+	rate = config.learning_rate
 
 	weights = make([][][]float64, len(layers)-1)
 	biases = make([][]float64, len(layers)-1)
