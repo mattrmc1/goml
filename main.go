@@ -62,13 +62,13 @@ func feedforward(input []float64) ([]float64, error) {
 		return []float64{}, fmt.Errorf("invalid input - expected size: %v", layers[0])
 	}
 
-	if validation.Validate1D(input, func(v float64) bool {
+	if !validation.Validate1D(input, func(v float64) bool {
 		return v >= 0 && v <= 1
 	}) {
 		return []float64{}, errors.New("all input values must be a float between 0 and 1")
 	}
 
-	var a []float64
+	a := make([]float64, len(input))
 	copy(a, input)
 
 	// a = sigmoid(dot(w, a) + b)

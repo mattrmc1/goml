@@ -4,7 +4,16 @@ import (
 	"testing"
 )
 
+func cleanup() {
+	rate = 0
+	layers = nil
+	weights = nil
+	biases = nil
+}
+
 func TestInitialize(t *testing.T) {
+	defer cleanup()
+
 	dimensions := []int{3, 8, 5, 12, 2}
 	config := Config{[]int{8, 5, 12}, 0.12}
 	initialize(3, 2, config)
@@ -60,4 +69,30 @@ func TestInitialize(t *testing.T) {
 		len(biases[3]) != 2 {
 		t.Fatalf("Bad bias dimensions at the second level")
 	}
+}
+
+func TestFeedForward(t *testing.T) {
+	defer cleanup()
+
+	input_size := 10
+	output_size := 4
+	initialize(input_size, output_size, Config{[]int{8, 5}, 0.1})
+
+	input := []float64{0.01, .1, .2, .3, .4, .5, .6, .7, .8, .9}
+	res, err := feedforward(input)
+
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	if len(res) != output_size {
+		t.Fatalf("expected output size: %v but got %v", output_size, len(res))
+	}
+
+	for _, v := range res {
+		if v < 0 || v > 1 {
+			t.Fatalf("received output values out of range: %v", res)
+		}
+	}
+
 }
