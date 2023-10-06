@@ -6,17 +6,17 @@ import (
 )
 
 // S = 1 / ( 1 + e^-x )
-func sigmoid(x float64) float64 {
+func Sigmoid(x float64) float64 {
 	return 1 / (1 + math.Exp(-x))
 }
 
 // S' = S(x) * ( 1 - S(x) )
-func deltaSigmoid(x float64) float64 {
-	return sigmoid(x) * (1 - sigmoid(x))
+func DeltaSigmoid(x float64) float64 {
+	return Sigmoid(x) * (1 - Sigmoid(x))
 }
 
 // C = (a(L) - y)^2
-func cost(a, y []float64) ([]float64, error) {
+func Cost(a, y []float64) ([]float64, error) {
 	if len(a) != len(y) {
 		return []float64{}, errors.New("output array dimensions does not match expected array dimensions")
 	}
@@ -31,7 +31,7 @@ func cost(a, y []float64) ([]float64, error) {
 }
 
 // C' = 2(a(L) - y)
-func deltaCost(a, y []float64) ([]float64, error) {
+func DeltaCost(a, y []float64) ([]float64, error) {
 	if len(a) != len(y) {
 		return []float64{}, errors.New("output array dimensions does not match expected array dimensions")
 	}

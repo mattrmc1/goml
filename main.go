@@ -1,7 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	formulas "goml/math"
+	"goml/math/matrix"
+	"goml/validation"
 	"math/rand"
 
 	"gonum.org/v1/gonum/mat"
@@ -50,20 +54,42 @@ func initialize(input int, output int, config Config) {
 }
 
 func feedforward(input []float64) ([]float64, error) {
-	// validate input matches input layer size
-	// validate all values <= 1
+	if len(layers) == 0 {
+		return []float64{}, errors.New("network not initialized correctly")
+	}
 
-	// a = copy of input (i.e. the first activation layer)
+	if len(input) != layers[0] {
+		return []float64{}, fmt.Errorf("invalid input - expected size: %v", layers[0])
+	}
 
-	// foreach w, b in range weights, biases {
-	// 	a = sig(mat.dot(W,a) + b)
-	// }
+	if validation.Validate1D(input, func(v float64) bool {
+		return v >= 0 && v <= 1
+	}) {
+		return []float64{}, errors.New("all input values must be a float between 0 and 1")
+	}
 
-	// NOTE: store each a[i] if we want to visualize the activation layers
+	var a []float64
+	copy(a, input)
 
-	// return a (i.e. the output activation layer)
+	// a = sigmoid(dot(w, a) + b)
+	for i := range weights {
+		w := weights[i]
+		b := biases[i]
 
-	return []float64{}, nil
+		p, err := matrix.Dot(w, a)
+		if err != nil {
+			return []float64{}, err
+		}
+
+		zl, err := matrix.Add1D(p, b)
+		if err != nil {
+			return []float64{}, err
+		}
+
+		a = matrix.Map1D(zl, formulas.Sigmoid)
+	}
+
+	return a, nil
 }
 
 func backpropagate(output, y []float64) ([][][]float64, [][]float64, error) {
