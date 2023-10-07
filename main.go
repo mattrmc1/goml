@@ -93,23 +93,33 @@ func feedforward(input []float64) ([]float64, error) {
 }
 
 func backpropagate(output, y []float64) ([][][]float64, [][]float64, error) {
-	// validate output dimensions equal y dimensions
+	if !validation.IsEqualDimensions1D(output, y) {
+		return [][][]float64{}, [][]float64{}, fmt.Errorf("expected output length %v but got %v", len(y), len(output))
+	}
 
 	// w := calculate weight deltas
-	//		-> dCdA -> either cost func or
+	//		--> dC/dW = prevA • deltaSig(zL) • dC/dA
+	//		--> dC/dA = isLastLayer ? deltaCost : w(L+1)^T * deltaSig(z(L+1)) * dCdA(L+1)
 
 	// b := calculate biases deltas
+
+	// return deltaWeights, deltaBiases, err
 
 	return [][][]float64{}, [][]float64{}, nil
 }
 
 func train() {
 	// initialize based on training data dimensions
+
+	// var deltaWeights, deltaBiases
+
 	// foreach training data point {
-	//		var output := feedforward
-	//		var cost := backpropagate (note the weights and biases get changed in this function)
-	//
+	//		output := feedforward(tInput)
+	//		deltaWeights, deltaBiases := backpropagate(output, tOutput)
+	//		--> sum deltas and keep going
 	// }
+
+	// Squeeze the deltas --> apply deltas?
 }
 
 func main() {
