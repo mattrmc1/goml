@@ -70,6 +70,87 @@ func TestDotFail(t *testing.T) {
 	}
 }
 
+func TestHadamardPass(t *testing.T) {
+	a := [][]float64{
+		{1, 3, -5},
+		{0, 0, 0},
+		{1, 2, 3},
+		{-1, -2, -3},
+	}
+	b := [][]float64{
+		{2, 3, 4},
+		{0, 2, 0},
+		{1, 9, 3},
+		{-1, -6, -1},
+	}
+	expected := [][]float64{
+		{2, 9, -20},
+		{0, 0, 0},
+		{1, 18, 9},
+		{1, 12, 3},
+	}
+
+	actual, err := Hadamard(a, b)
+
+	if err != nil {
+		t.Fatalf(err.Error())
+	}
+
+	if len(actual) != len(expected) {
+		t.Fatalf("expected %v \n actual %v", expected, actual)
+	}
+
+	for i := range actual {
+		if len(actual[i]) != len(expected[i]) {
+			t.Fatalf("expected %v \n actual %v", expected, actual)
+		}
+		for j := range actual[i] {
+			if actual[i][j] != expected[i][j] {
+				t.Fatalf("expected %v \n actual %v", expected, actual)
+			}
+		}
+	}
+}
+
+func TestHadamardFail(t *testing.T) {
+	a1 := [][]float64{
+		{1, 3, -5},
+		{0, 0, 0},
+		{1, 2, 3},
+		{-1, -2, -3},
+	}
+	b1 := [][]float64{
+		{2, 3, 4},
+		{0, 2, 0},
+		{1, 9, 3},
+	}
+
+	_, err := Hadamard(a1, b1)
+
+	if err == nil {
+		t.Fatalf("test1 expected error")
+	}
+
+	a2 := [][]float64{
+		{1, 3, -5},
+		{0, 0, 0},
+		{1, 2, 3},
+		{-1, -2, -3},
+	}
+	b2 := [][]float64{
+		{2, 3, 4},
+		{0, 2, 0},
+		{1, 3},
+		{-1, -6, -1},
+	}
+
+	_, err = Hadamard(a2, b2)
+
+	if err == nil {
+		t.Fatalf("test2 expected error")
+	}
+}
+
 func TestAdd1DPass(t *testing.T) {
 	a := []float64{1, 1, 1}
 	b := []float64{9, -1, 0}

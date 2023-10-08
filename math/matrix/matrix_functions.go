@@ -5,6 +5,14 @@ import (
 	"goml/validation"
 )
 
+func Create2D(rows, cols int) [][]float64 {
+	res := make([][]float64, rows)
+	for i := range res {
+		res[i] = make([]float64, cols)
+	}
+	return res
+}
+
 func Dot(w [][]float64, a []float64) ([]float64, error) {
 	var res []float64
 
@@ -18,6 +26,21 @@ func Dot(w [][]float64, a []float64) ([]float64, error) {
 			sum += w[i][j] * a[j]
 		}
 		res = append(res, sum)
+	}
+
+	return res, nil
+}
+
+func Hadamard(a, b [][]float64) ([][]float64, error) {
+	if !validation.IsEqualDimensions2D(a, b) {
+		return [][]float64{}, errors.New("both matrices must be identical dimensions when calculating the hadamard product")
+	}
+
+	res := Create2D(len(a), len(a[0]))
+	for i := range a {
+		for j := range a[i] {
+			res[i][j] = a[i][j] * b[i][j]
+		}
 	}
 
 	return res, nil
