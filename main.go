@@ -1,11 +1,7 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	formulas "goml/math"
-	"goml/math/matrix"
-	"goml/validation"
 	"math/rand"
 
 	"gonum.org/v1/gonum/mat"
@@ -22,6 +18,7 @@ const (
 
 var rate float64
 var layers []int
+var activations [][]float64
 var weights [][][]float64
 var biases [][]float64
 
@@ -33,10 +30,16 @@ func initialize(input int, output int, config Config) {
 
 	rate = config.learning_rate
 
+	activations = make([][]float64, len(layers))
 	weights = make([][][]float64, len(layers)-1)
 	biases = make([][]float64, len(layers)-1)
 
-	for i := 1; i < len(layers); i++ {
+	for i := 0; i < len(layers); i++ {
+
+		activations[i] = make([]float64, layers[i])
+		if i == 0 {
+			continue
+		}
 
 		weights[i-1] = make([][]float64, layers[i])
 		for j := range weights[i-1] {
@@ -53,61 +56,6 @@ func initialize(input int, output int, config Config) {
 	}
 }
 
-func feedforward(input []float64) ([]float64, error) {
-	if len(layers) == 0 {
-		return []float64{}, errors.New("network not initialized correctly")
-	}
-
-	if len(input) != layers[0] {
-		return []float64{}, fmt.Errorf("invalid input - expected size: %v", layers[0])
-	}
-
-	if !validation.Validate1D(input, func(v float64) bool {
-		return v >= 0 && v <= 1
-	}) {
-		return []float64{}, errors.New("all input values must be a float between 0 and 1")
-	}
-
-	a := make([]float64, len(input))
-	copy(a, input)
-
-	// a = sigmoid(dot(w, a) + b)
-	for i := range weights {
-		w := weights[i]
-		b := biases[i]
-
-		p, err := matrix.Dot(w, a)
-		if err != nil {
-			return []float64{}, err
-		}
-
-		zl, err := matrix.Add1D(p, b)
-		if err != nil {
-			return []float64{}, err
-		}
-
-		a = matrix.Map1D(zl, formulas.Sigmoid)
-	}
-
-	return a, nil
-}
-
-func backpropagate(output, y []float64) ([][][]float64, [][]float64, error) {
-	if !validation.IsEqualDimensions1D(output, y) {
-		return [][][]float64{}, [][]float64{}, fmt.Errorf("expected output length %v but got %v", len(y), len(output))
-	}
-
-	// w := calculate weight deltas
-	//		--> dC/dW = prevA • deltaSig(zL) • dC/dA
-	//		--> dC/dA = isLastLayer ? deltaCost : w(L+1)^T * deltaSig(z(L+1)) * dCdA(L+1)
-
-	// b := calculate biases deltas
-
-	// return deltaWeights, deltaBiases, err
-
-	return [][][]float64{}, [][]float64{}, nil
-}
-
 func train() {
 	// initialize based on training data dimensions
 
@@ -116,10 +64,16 @@ func train() {
 	// foreach training data point {
 	//		output := feedforward(tInput)
 	//		deltaWeights, deltaBiases := backpropagate(output, tOutput)
-	//		--> sum deltas and keep going
+	//		--> sum deltas and keep going (apply deltas now?)
 	// }
 
 	// Squeeze the deltas --> apply deltas?
+}
+
+func run() {
+	// validate initialization
+
+	// feedforward on input without storing activation nodes
 }
 
 func main() {
