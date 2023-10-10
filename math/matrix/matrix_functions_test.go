@@ -16,6 +16,49 @@ func isEqual(a, b []float64) bool {
 	return true
 }
 
+func isEqual2D(a, b [][]float64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if len(a[i]) != len(b[i]) {
+			return false
+		}
+		for j := range a[i] {
+			if a[i][j] != b[i][j] {
+				return false
+			}
+		}
+
+	}
+	return true
+}
+
+func TestDotCreateWeights(t *testing.T) {
+	right := []float64{
+		1,
+		2,
+		3,
+		4,
+	}
+	left := []float64{
+		1, 2, 3,
+	}
+
+	expected := [][]float64{
+		{1, 2, 3},
+		{2, 4, 6},
+		{3, 6, 9},
+		{4, 8, 12},
+	}
+	actual := DotToCreateWeights(right, left)
+
+	if !isEqual2D(actual, expected) {
+		t.Fatalf("expected %v but got %v", expected, actual)
+	}
+
+}
+
 func TestDotCase1(t *testing.T) {
 	w := [][]float64{
 		{1, 3, -5},
@@ -23,7 +66,7 @@ func TestDotCase1(t *testing.T) {
 	a := []float64{4, -2, -1}
 	expected := []float64{3}
 
-	actual, err := Dot(w, a)
+	actual, err := DotWeightsAndActivations(w, a)
 
 	if err != nil {
 		t.Fatalf("error received but expected success")
@@ -44,7 +87,7 @@ func TestDotCase2(t *testing.T) {
 	a := []float64{4, -2, -1}
 	expected := []float64{3, 0, -3, 3}
 
-	actual, err := Dot(w, a)
+	actual, err := DotWeightsAndActivations(w, a)
 
 	if err != nil {
 		t.Fatalf("error received but expected success")
@@ -63,7 +106,7 @@ func TestDotFail(t *testing.T) {
 		{-1, -2, -3},
 	}
 	a := []float64{4, -2, -1, 1}
-	_, err := Dot(w, a)
+	_, err := DotWeightsAndActivations(w, a)
 
 	if err == nil {
 		t.Fatalf("expected error")
@@ -90,7 +133,7 @@ func TestHadamardPass(t *testing.T) {
 		{1, 12, 3},
 	}
 
-	actual, err := Hadamard(a, b)
+	actual, err := Hadamard2D(a, b)
 
 	if err != nil {
 		t.Fatalf(err.Error())
@@ -125,7 +168,7 @@ func TestHadamardFail(t *testing.T) {
 		{1, 9, 3},
 	}
 
-	_, err := Hadamard(a1, b1)
+	_, err := Hadamard2D(a1, b1)
 
 	if err == nil {
 		t.Fatalf("test1 expected error")
@@ -144,7 +187,7 @@ func TestHadamardFail(t *testing.T) {
 		{-1, -6, -1},
 	}
 
-	_, err = Hadamard(a2, b2)
+	_, err = Hadamard2D(a2, b2)
 
 	if err == nil {
 		t.Fatalf("test2 expected error")

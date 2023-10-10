@@ -1,35 +1,61 @@
 package main
 
-import "goml/math/matrix"
+import (
+	"fmt"
+	formulas "goml/math"
+	"goml/math/matrix"
+)
 
-func z(l int) ([]float64, error) {
-	p, err := matrix.Dot(weights[l], activations[l-1])
+func dCdA(l int, y []float64) ([]float64, error) {
+	if l == len(weights)-1 {
+		return formulas.DeltaCost(activations[l+1], y)
+	}
+
+	zL1, err := CalculateZL(l + 1)
 	if err != nil {
 		return []float64{}, err
 	}
-	return matrix.Add1D(p, biases[l])
+
+	nextA, err := dCdA(l+1, y)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	p, err := matrix.Hadamard1D(matrix.Map1D(zL1, formulas.DeltaSigmoid), nextA)
+	if err != nil {
+		return []float64{}, err
+	}
+
+	return matrix.DotWeightsAndActivations(matrix.Transpose(weights[l+1]), p)
 }
 
-func dCdA(l int, tOutput []float64) []float64 {
-	// dC/dA:
-	// 		if last layer, compare to expected output layer
-	//				-> deltaCost fn
-	//		else, recursively calculate to last layer
-	//				-> w(l+1)^T * deltaSig(z(l+1)) * dC/dA(l+1)
-
-	return []float64{}
-}
-
-func calculateDeltasAtLayer(layer int) ([][]float64, []float64, error) {
+func calculateDeltasAtLayer(l int, y []float64) ([][]float64, []float64, error) {
 	// calculate z(l) -> w(l) * a(l-1) + b(l)
 
 	// dC/dB -> deltaSig(z(l)) • dC/dA
 	// dC/dW -> a(l-1) • deltaSig(z(l)) • dC/dA
 
-	var deltaWeights [][]float64
-	var deltaBaises []float64
+	dcda, err := dCdA(l, y)
+	if err != nil {
+		fmt.Printf("err:%v", err.Error())
+	}
 
-	return deltaWeights, deltaBaises, nil
+	// fmt.Printf("\n\nlayer: %v", l)
+
+	zl, _ := CalculateZL(l)
+	// fmt.Printf("\n zl %v", zl)
+	dzl := matrix.Map1D(zl, formulas.DeltaSigmoid)
+	// fmt.Printf("\n dzl %v", dzl)
+
+	deltaBiases, err := matrix.Hadamard1D(dcda, dzl)
+	// fmt.Printf("\n deltaBiases %v", deltaBiases)
+	if err != nil {
+		fmt.Printf("err:%v", err.Error())
+	}
+	deltaWeights := matrix.DotToCreateWeights(deltaBiases, activations[l])
+	// fmt.Printf("\n deltaWeights %v", deltaWeights)
+
+	return deltaWeights, deltaBiases, nil
 }
 
 // Returns all deltaWeights, deltaBaises
@@ -52,11 +78,13 @@ func Backpropagate(tInput, tOutput []float64) ([][][]float64, [][]float64, error
 	//		-> push to deltaWeights, deltaBiases matrices respectively
 	//			note: since we're looping backwards we need to reverse. Could also unset to front instead of pushing
 
+	Feedforward(tInput)
+
 	var deltaWeights [][][]float64
 	var deltaBaises [][]float64
 
 	for l := len(weights) - 1; l >= 0; l-- {
-		dW, dB, err := calculateDeltasAtLayer(l)
+		dW, dB, err := calculateDeltasAtLayer(l, tOutput)
 		if err != nil {
 			return [][][]float64{}, [][]float64{}, err
 		}

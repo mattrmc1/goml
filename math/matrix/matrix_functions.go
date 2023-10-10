@@ -13,27 +13,66 @@ func Create2D(rows, cols int) [][]float64 {
 	return res
 }
 
-func Dot(w [][]float64, a []float64) ([]float64, error) {
-	var res []float64
+// r(j) • l(k) -> w(j,k)
+func DotToCreateWeights(right, left []float64) [][]float64 {
+	w := Create2D(len(right), len(left))
 
-	for i, v := range w {
-		if !validation.IsEqualDimensions1D(v, a) {
-			return []float64{}, errors.New("weight row size must match activation column size")
+	for j, a := range right {
+		for k, b := range left {
+			w[j][k] = a * b
+		}
+	}
+
+	return w
+}
+
+// w(j,k) • a(k) -> z(j)
+func DotWeightsAndActivations(w [][]float64, a []float64) ([]float64, error) {
+	var res = make([]float64, len(w))
+
+	for i := range w {
+		if !validation.IsEqualDimensions1D(w[i], a) {
+			return []float64{}, errors.New("weight column size must match activation row size")
 		}
 
 		sum := float64(0)
-		for j := range v {
+		for j := range w[i] {
 			sum += w[i][j] * a[j]
 		}
-		res = append(res, sum)
+		res[i] = sum
 	}
 
 	return res, nil
 }
 
-func Hadamard(a, b [][]float64) ([][]float64, error) {
+func Transpose(m [][]float64) [][]float64 {
+	res := make([][]float64, len(m[0]))
+	for i := range res {
+		res[i] = make([]float64, len(m))
+		for j := range res[i] {
+			res[i][j] = m[j][i]
+		}
+	}
+
+	return res
+}
+
+func Hadamard1D(a, b []float64) ([]float64, error) {
+	if !validation.IsEqualDimensions1D(a, b) {
+		return []float64{}, errors.New("matrices must have identical dimensions when calculating the hadamard product")
+	}
+
+	res := make([]float64, len(a))
+	for i := range a {
+		res[i] = a[i] * b[i]
+	}
+
+	return res, nil
+}
+
+func Hadamard2D(a, b [][]float64) ([][]float64, error) {
 	if !validation.IsEqualDimensions2D(a, b) {
-		return [][]float64{}, errors.New("both matrices must be identical dimensions when calculating the hadamard product")
+		return [][]float64{}, errors.New("matrices must have identical dimensions when calculating the hadamard product")
 	}
 
 	res := Create2D(len(a), len(a[0]))

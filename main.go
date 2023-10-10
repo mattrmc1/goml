@@ -7,6 +7,11 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+type TrainingData struct {
+	tInput  []float64
+	tOutput []float64
+}
+
 type Config struct {
 	layers        []int
 	learning_rate float64
@@ -22,7 +27,7 @@ var activations [][]float64
 var weights [][][]float64
 var biases [][]float64
 
-func initialize(input int, output int, config Config) {
+func Initialize(input int, output int, config Config) {
 	layers = nil
 	layers = append(layers, input)
 	layers = append(layers, config.layers...)
@@ -45,32 +50,75 @@ func initialize(input int, output int, config Config) {
 		for j := range weights[i-1] {
 			weights[i-1][j] = make([]float64, layers[i-1])
 			for k := range weights[i-1][j] {
-				weights[i-1][j][k] = rand.Float64()
+				weights[i-1][j][k] = rand.Float64() * .5
 			}
 		}
 
 		biases[i-1] = make([]float64, layers[i])
 		for j := range biases[i-1] {
-			biases[i-1][j] = rand.Float64()
+			biases[i-1][j] = float64(0)
 		}
 	}
 }
 
-func train() {
+func Train() {
 	// initialize based on training data dimensions
 
-	// var deltaWeights, deltaBiases
+	tmp := []TrainingData{
+		{
+			[]float64{1, 0, 0, 0},
+			[]float64{1, 1},
+		},
+		{
+			[]float64{0, 0, 1, 0},
+			[]float64{1, 1},
+		},
+		{
+			[]float64{0, 1, 0, 0},
+			[]float64{0, 0},
+		},
+		{
+			[]float64{0, 0, 0, 1},
+			[]float64{0, 0},
+		},
+	}
 
-	// foreach training data point {
-	//		output := feedforward(tInput)
-	//		deltaWeights, deltaBiases := backpropagate(output, tOutput)
-	//		--> sum deltas and keep going (apply deltas now?)
-	// }
+	// tmp init
+	Initialize(4, 2, Config{[]int{5, 6}, DEFAULT_LEARNING_RATE})
 
-	// Squeeze the deltas --> apply deltas?
+	tmpMaxIter := 10000
+
+	fmt.Printf("\n before %v \n", weights)
+
+	for i := 0; i < tmpMaxIter; i++ {
+		for _, td := range tmp {
+
+			deltaWeights, _, err := Backpropagate(td.tInput, td.tOutput)
+			if err != nil {
+				fmt.Printf("\n err %v", err)
+				return
+			}
+			for i := range weights {
+				for j := range weights[i] {
+					for k := range weights[i][j] {
+						weights[i][j][k] = weights[i][j][k] - deltaWeights[i][j][k]*rate
+					}
+				}
+			}
+			// fmt.Printf("\n dW %v \n", deltaWeights)
+			// fmt.Printf("\n dB %v \n", deltaBiases)
+		}
+	}
+
+	fmt.Printf("\n after %v \n", weights)
+
+	for _, td := range tmp {
+		output, _ := Feedforward(td.tInput)
+		fmt.Printf("\n\n Expected: %v \n Actual: %v \n\n", output, td.tOutput)
+	}
 }
 
-func run() {
+func Run() {
 	// validate initialization
 
 	// feedforward on input without storing activation nodes

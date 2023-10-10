@@ -12,11 +12,11 @@ func Cleanup() {
 }
 
 func TestInitialize(t *testing.T) {
-	defer cleanup()
+	defer Cleanup()
 
 	dimensions := []int{3, 8, 5, 12, 2}
 	config := Config{[]int{8, 5, 12}, 0.12}
-	initialize(3, 2, config)
+	Initialize(3, 2, config)
 
 	// init learning rate
 	if rate != config.learning_rate {
@@ -105,5 +105,8 @@ func TestInitialize(t *testing.T) {
 			}
 		}
 	}
+}
 
+func TestTmp(t *testing.T) {
+	Train()
 }

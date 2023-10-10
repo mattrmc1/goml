@@ -9,7 +9,7 @@ func TestFeedForward(t *testing.T) {
 
 	input_size := 10
 	output_size := 4
-	initialize(input_size, output_size, Config{[]int{8, 5}, 0.1})
+	Initialize(input_size, output_size, Config{[]int{8, 5}, 0.1})
 
 	input := []float64{0.01, .1, .2, .3, .4, .5, .6, .7, .8, .9}
 	res, err := Feedforward(input)

@@ -8,6 +8,17 @@ import (
 	"goml/validation"
 )
 
+// z(l) -> w(l) * a(l-1) + b(l)
+// note: activations[1] is weights[0]
+// l at index 0 is "really" layer 1 bc layer 0 is the input layer
+func CalculateZL(l int) ([]float64, error) {
+	p, err := matrix.DotWeightsAndActivations(weights[l], activations[l])
+	if err != nil {
+		return []float64{}, err
+	}
+	return matrix.Add1D(p, biases[l])
+}
+
 func Feedforward(input []float64) ([]float64, error) {
 	if len(layers) == 0 {
 		return []float64{}, errors.New("network not initialized correctly")
@@ -31,15 +42,7 @@ func Feedforward(input []float64) ([]float64, error) {
 
 	// a = sigmoid(dot(w, a) + b)
 	for i := range weights {
-		w := weights[i]
-		b := biases[i]
-
-		p, err := matrix.Dot(w, a)
-		if err != nil {
-			return []float64{}, err
-		}
-
-		zl, err := matrix.Add1D(p, b)
+		zl, err := CalculateZL(i)
 		if err != nil {
 			return []float64{}, err
 		}
