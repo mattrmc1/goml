@@ -4,62 +4,170 @@ import (
 	"testing"
 )
 
-func TestIsEqualDimensions(t *testing.T) {
+func TestIsEqualDimensions1D(t *testing.T) {
 	if !IsEqualDimensions1D([]float64{1, 1, 1}, []float64{4, 3, 6}) {
 		t.Fatalf("expected to pass but failed (1D)")
 	}
 	if IsEqualDimensions1D([]float64{1, 1}, []float64{4, 3, 6}) {
 		t.Fatalf("expected to fail but passed (1D)")
 	}
+}
 
-	shouldPass := [][][]float64{
-		{
+func TestIsEqualDimensions2D(t *testing.T) {
+	shouldReturnTrue := IsEqualDimensions2D(
+		[][]float64{
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 		},
-		{
+		[][]float64{
 			{0, 1, 1, 30},
 			{1, 20, 1, 1},
 			{1, 1, 10, 1},
 		},
+	)
+
+	if !shouldReturnTrue {
+		t.Fail()
 	}
-	shouldFail1 := [][][]float64{
-		{
+
+	shouldReturnFalse1 := IsEqualDimensions2D(
+		[][]float64{
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 		},
-		{
+		[][]float64{
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 		},
+	)
+
+	if shouldReturnFalse1 {
+		t.Fail()
 	}
-	shouldFail2 := [][][]float64{
-		{
+
+	shouldReturnFalse2 := IsEqualDimensions2D(
+		[][]float64{
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 			{1, 1, 1, 1},
 		},
-		{
+		[][]float64{
 			{1, 1, 1, 1, 1},
 			{1, 1, 1, 1, 1},
 			{1, 1, 1, 1, 1},
 		},
+	)
+
+	if shouldReturnFalse2 {
+		t.Fail()
+	}
+}
+
+func TestIsEqualDimensions3D(t *testing.T) {
+	shouldReturnTrue := IsEqualDimensions3D(
+		[][][]float64{
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+		},
+		[][][]float64{
+			{
+				{0, 1, 1, 30},
+				{1, 20, 1, 1},
+			},
+			{
+				{1, 20, 1, 1},
+				{1, 1, 10, 1},
+			},
+		},
+	)
+
+	if !shouldReturnTrue {
+		t.Fail()
 	}
 
-	if !IsEqualDimensions2D(shouldPass[0], shouldPass[1]) {
-		t.Fatalf("expected to pass but failed (2D)")
+	shouldReturnFalse1 := IsEqualDimensions3D(
+		[][][]float64{
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+		},
+		[][][]float64{
+			{
+				{0, 1, 1, 30},
+				{1, 20, 1, 1},
+			},
+		},
+	)
+
+	if shouldReturnFalse1 {
+		t.Fail()
 	}
 
-	if IsEqualDimensions2D(shouldFail1[0], shouldFail1[1]) {
-		t.Fatalf("expected to fail but passed (2D rows)")
+	shouldReturnFalse2 := IsEqualDimensions3D(
+		[][][]float64{
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+		},
+		[][][]float64{
+			{
+				{1, 20, 1, 1},
+			},
+			{
+				{1, 1, 10, 1},
+			},
+		},
+	)
+
+	if shouldReturnFalse2 {
+		t.Fail()
 	}
 
-	if IsEqualDimensions2D(shouldFail2[0], shouldFail2[1]) {
-		t.Fatalf("expected to fail but passed (2D cols)")
+	shouldReturnFalse3 := IsEqualDimensions3D(
+		[][][]float64{
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+			{
+				{1, 1, 1, 1},
+				{1, 1, 1, 1},
+			},
+		},
+		[][][]float64{
+			{
+				{0, 1, 30},
+				{1, 20, 1},
+			},
+			{
+				{1, 20, 1},
+				{1, 10, 1},
+			},
+		},
+	)
+
+	if shouldReturnFalse3 {
+		t.Fail()
 	}
 }
 

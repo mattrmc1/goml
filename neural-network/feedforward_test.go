@@ -1,18 +1,18 @@
-package main
+package neuralnetwork
 
 import (
 	"testing"
 )
 
 func TestFeedForward(t *testing.T) {
-	defer Cleanup()
+	defer cleanup()
 
 	input_size := 10
 	output_size := 4
 	Initialize(input_size, output_size, Config{[]int{8, 5}, 0.1})
 
 	input := []float64{0.01, .1, .2, .3, .4, .5, .6, .7, .8, .9}
-	res, err := Feedforward(input)
+	res, err := feedforward(input)
 
 	if err != nil {
 		t.Fatalf(err.Error())

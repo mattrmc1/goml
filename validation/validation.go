@@ -20,6 +20,25 @@ func IsEqualDimensions2D(a, b [][]float64) bool {
 	return true
 }
 
+func IsEqualDimensions3D(a, b [][][]float64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if len(a[i]) != len(b[i]) {
+			return false
+		}
+		for j := range a[i] {
+			if len(a[i][j]) != len(b[i][j]) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 func Validate1D(a []float64, fn validator) bool {
 	for _, v := range a {
 		if !fn(v) {
