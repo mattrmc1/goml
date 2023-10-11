@@ -2,7 +2,7 @@ package neuralnetwork
 
 import (
 	"fmt"
-	"goml/validation"
+	"goml/math/matrix"
 	"testing"
 )
 
@@ -128,7 +128,7 @@ func TestCalculateDeltas_dimensions(t *testing.T) {
 			t.Fatalf("error %v", err)
 		}
 
-		valid := validation.IsEqualDimensions2D(dw, w) && validation.IsEqualDimensions1D(db, biases[l])
+		valid := matrix.IsEqualDimensions2D(dw, w) && matrix.IsEqualDimensions1D(db, biases[l])
 
 		if !valid {
 			t.Fail()

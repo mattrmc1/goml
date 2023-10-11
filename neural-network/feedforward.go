@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"goml/math/formulas"
 	"goml/math/matrix"
-	"goml/validation"
 )
 
-// a(l) -> squish(w(l) * a(l-1) + b(l))
+// a(l) -> s(w(l) * a(l-1) + b(l))
 func feedforward(input []float64) ([]float64, error) {
 	if len(layers) == 0 {
 		return []float64{}, errors.New("network not initialized correctly")
@@ -18,7 +17,7 @@ func feedforward(input []float64) ([]float64, error) {
 		return []float64{}, fmt.Errorf("invalid input - expected size: %v", layers[0])
 	}
 
-	if !validation.Validate1D(input, func(v float64) bool {
+	if !matrix.Validate1D(input, func(v float64) bool {
 		return v >= 0 && v <= 1
 	}) {
 		return []float64{}, errors.New("all input values must be a float between 0 and 1")

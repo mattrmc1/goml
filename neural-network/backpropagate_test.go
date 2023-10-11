@@ -1,7 +1,7 @@
 package neuralnetwork
 
 import (
-	"goml/validation"
+	"goml/math/matrix"
 	"testing"
 )
 
@@ -20,11 +20,11 @@ func TestBackpropagate(t *testing.T) {
 		t.Fatalf("error %v", err)
 	}
 
-	if !validation.IsEqualDimensions3D(dw, weights) {
+	if !matrix.IsEqualDimensions3D(dw, weights) {
 		t.Fatalf("dC/dW dimensions should match weights dimensions")
 	}
 
-	if !validation.IsEqualDimensions2D(db, biases) {
+	if !matrix.IsEqualDimensions2D(db, biases) {
 		t.Fatalf("dC/dB dimensions should match biases dimensions")
 	}
 }

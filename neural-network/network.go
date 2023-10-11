@@ -1,6 +1,7 @@
 package neuralnetwork
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 )
@@ -59,22 +60,28 @@ func Initialize(input int, output int, config Config) {
 	}
 }
 
-// Tmp
-func Train(t []TrainingData, maxIter int) {
+func Train(t []TrainingData, maxIter int) error {
 
-	// validate initialization (maybe just...initialize?)
-	// validate training data
+	if !IsInitialized() {
+		return errors.New("neural network not initialized")
+	}
 
-	fmt.Printf("\n before %v \n", weights)
-
-	for i := 0; i < maxIter; i++ {
+	// Run through all test cases maxIter times
+	for iter := 0; iter < maxIter; iter++ {
+		// For all test cases
 		for _, td := range t {
-
-			deltaWeights, _, err := backpropagate(td.tInput, td.tOutput)
-			if err != nil {
-				fmt.Printf("\n err %v", err)
-				return
+			// validate test data inputs and outputs
+			if !isValidInput(td.tInput) || !isValidOutput(td.tOutput) {
+				return fmt.Errorf("invalid training data %v", td)
 			}
+
+			// calculate deltas
+			deltaWeights, deltaBiases, err := backpropagate(td.tInput, td.tOutput)
+			if err != nil {
+				return err
+			}
+
+			// apply weight deltas
 			for i := range weights {
 				for j := range weights[i] {
 					for k := range weights[i][j] {
@@ -82,20 +89,33 @@ func Train(t []TrainingData, maxIter int) {
 					}
 				}
 			}
+
+			// apply bias deltas
+			for i := range biases {
+				for j := range biases[i] {
+					biases[i][j] = biases[i][j] - deltaBiases[i][j]*rate
+				}
+			}
 		}
 	}
 
-	fmt.Printf("\n after %v \n", weights)
+	// debug
+	// for _, td := range t {
+	// 	output, _ := feedforward(td.tInput)
+	// 	fmt.Printf("\n\n Expected: %v \n Actual: %v \n\n", output, td.tOutput)
+	// }
 
-	for _, td := range t {
-		output, _ := feedforward(td.tInput)
-		fmt.Printf("\n\n Expected: %v \n Actual: %v \n\n", output, td.tOutput)
-	}
+	return nil
 }
 
 func Run(input []float64) ([]float64, error) {
-	// validate initialization
-	// validate input
+	if !IsInitialized() {
+		return []float64{}, errors.New("neural network not initialized")
+	}
+
+	if !isValidInput(input) {
+		return []float64{}, errors.New("invalid input")
+	}
 
 	return feedforward(input)
 }

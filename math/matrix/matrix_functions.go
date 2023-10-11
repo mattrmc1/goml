@@ -2,7 +2,6 @@ package matrix
 
 import (
 	"errors"
-	"goml/validation"
 )
 
 func Create2D(rows, cols int) [][]float64 {
@@ -31,7 +30,7 @@ func DotWeightsAndActivations(w [][]float64, a []float64) ([]float64, error) {
 	var res = make([]float64, len(w))
 
 	for i := range w {
-		if !validation.IsEqualDimensions1D(w[i], a) {
+		if !IsEqualDimensions1D(w[i], a) {
 			return []float64{}, errors.New("weight column size must match activation row size")
 		}
 
@@ -58,7 +57,7 @@ func Transpose(m [][]float64) [][]float64 {
 }
 
 func Hadamard1D(a, b []float64) ([]float64, error) {
-	if !validation.IsEqualDimensions1D(a, b) {
+	if !IsEqualDimensions1D(a, b) {
 		return []float64{}, errors.New("matrices must have identical dimensions when calculating the hadamard product")
 	}
 
@@ -71,7 +70,7 @@ func Hadamard1D(a, b []float64) ([]float64, error) {
 }
 
 func Hadamard2D(a, b [][]float64) ([][]float64, error) {
-	if !validation.IsEqualDimensions2D(a, b) {
+	if !IsEqualDimensions2D(a, b) {
 		return [][]float64{}, errors.New("matrices must have identical dimensions when calculating the hadamard product")
 	}
 
@@ -86,7 +85,7 @@ func Hadamard2D(a, b [][]float64) ([][]float64, error) {
 }
 
 func Add1D(a, b []float64) ([]float64, error) {
-	if !validation.IsEqualDimensions1D(a, b) {
+	if !IsEqualDimensions1D(a, b) {
 		return []float64{}, errors.New("cannot add 2 arrays of different dimensions")
 	}
 

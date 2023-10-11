@@ -1,4 +1,4 @@
-package validation
+package matrix
 
 type validator func(float64) bool
 

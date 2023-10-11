@@ -14,11 +14,7 @@ func z(l int) ([]float64, error) {
 	return matrix.Add1D(p, biases[l])
 }
 
-// dC/dA
-//
-//	-> ∑ w(l+1) • s'(z(l+1)) • dC/dA(l+1)
-//	OR
-//	-> deltacost(output, y)
+// dC/dA = ∑ w(l+1) • s'(z(l+1)) • dC/dA(l+1) OR deltacost(output, y)
 func dCdA(l int, y []float64) ([]float64, error) {
 	if l == len(weights)-1 {
 		return formulas.DeltaCost(activations[l+1], y)
@@ -42,6 +38,7 @@ func dCdA(l int, y []float64) ([]float64, error) {
 	return matrix.DotWeightsAndActivations(matrix.Transpose(weights[l+1]), p)
 }
 
+// dC/dW and dC/dB for a given layer
 func calculateDeltas(l int, y []float64) ([][]float64, []float64, error) {
 
 	// s'(z(l))

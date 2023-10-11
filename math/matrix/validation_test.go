@@ -1,4 +1,4 @@
-package validation
+package matrix
 
 import (
 	"testing"
